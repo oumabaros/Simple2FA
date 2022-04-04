@@ -1,8 +1,46 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Login Page";
+    
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<script src="~/js/dynamic.js" asp-append-version="true"></script>
+<div id="main">
+
 </div>
+<script src="~/js/dynamic.js" asp-append-version="true"></script>
+<script>
+    sectionTable("main", "tbl_login", "tr");
+    sectionTable("", "tbl_login", "td", "|Username");
+    sectionTable("", "tbl_login", "td", "", dyn("input", "type=text|style=width:200px;height:30px;|id=username|name=username|placeholder=Username"));
+    sectionTable("", "tbl_login", "tr");
+    sectionTable("", "tbl_login", "td", "class=right|style=width:135px;height:30px;|id=|Password");
+    sectionTable("", "tbl_login", "td", "", dyn("input", "type=password|style=width:200px;height:30px;|id=password|name=password|placeholder=Password"));
+    sectionTable("", "tbl_login", "tr");
+    sectionTable("", "tbl_login", "td", "", dyn("label", "style=width:200px;height:30px;|id=lbl_status|"));
+    sectionTable("", "tbl_login", "tr");
+    sectionTable("", "tbl_login", "td", "", dyn("button", "class=btn btn-sm btn-success|style=width:200px;height:30px;|id=cmd_submit|onclick=Login()|Login"));
+
+
+    function Login() {
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password").value;
+
+        if (username != "" && password != "") {
+            let data = { username: username, password: password };
+
+            $.post("/Home/Login", { LoginData: JSON.stringify(data) }, function (data) {
+                var status_label = document.getElementById("lbl_status");
+                status_label.innerHTML = data.statustext;
+                if (data.status == 1) {
+                    location.href = "/Home/TwoFactorAuth?username=" + data.username;
+                    status_label.style.color = "green";
+                }
+                else {
+                    status_label.style.color = "red";
+                    document.getElementById("username").value = "";
+                    document.getElementById("password").value = "";
+                }
+            });
+        }
+    }
+</script>

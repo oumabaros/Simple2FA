@@ -1,6 +1,7 @@
 ﻿using Google.Authenticator;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Simple2FA.Models;
 using System;
 using System.Collections.Generic;
@@ -24,28 +25,26 @@ namespace Simple2FA.Controllers
         {
             return View();
         }
-        [HttpGet]
-        public ActionResult Login()
-        {
-            return View();
-        }
+        
         [HttpPost]
-        public ActionResult Login(User user)
+        public JsonResult Login(string LoginData)
         {
+            User usr = new User();
+            usr = JsonConvert.DeserializeObject<User>(LoginData);
+            
             //get user login details from database
             DataTable dat = DBF.GetCMS();
-            string username = dat.Rows[0]["UserName"].ToString();
-            string password= dat.Rows[0]["Password"].ToString();
+            string usr_name = dat.Rows[0]["UserName"].ToString();
+            string pwd= dat.Rows[0]["Password"].ToString();
 
             //attempt login
-            if(user.UserName==username && user.Password == password)
+            if(usr_name==usr.UserName && pwd == usr.Password)
             {
                 //login successful?...go to 2FA action 
-               return RedirectToAction("TwoFactorAuth",new { username=username});
+               return Json(new { username=usr.UserName,status="1",statustext="Login Successful!" });
             }
             //login failed?...return login form
-            ViewBag.LoginMessage = "Login Failed";
-            return View();
+             return Json(new { username = usr.UserName, status = "0",statustext="Login Failed!" });
         }
         [HttpGet]
         public ActionResult TwoFactorAuth( string username)
@@ -66,9 +65,9 @@ namespace Simple2FA.Controllers
             bool isValid = twoFactor.ValidateTwoFactorPIN(TwoFactorKey(username), inputCode);
             if (!isValid)
             {
-                return Redirect("/Home/Login");
+                return Redirect("/Home/Index");
             }
-            return Redirect("/Home/Index");
+            return Redirect("/Home/Dashboard");
         }
         private static string TwoFactorKey(string username)
         {
@@ -76,6 +75,11 @@ namespace Simple2FA.Controllers
         }
 
         public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        public IActionResult Dashboard()
         {
             return View();
         }
