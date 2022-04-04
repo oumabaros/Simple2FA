@@ -1,0 +1,39 @@
+﻿@model Simple2FA.Models.User
+@{
+    ViewData["Title"] = "Login";
+}
+<h4>Login</h4>
+<div class="row">
+    <div class="col-lg-4">
+        <form asp-action="Login" asp-controller="Home" method="post">
+            <table>
+                <tr>
+                    <td>
+                        Username
+                    </td>
+                    <td>
+                        <input type="text" asp-for="UserName" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Password</td>
+                    <td>
+                        <input type="password" asp-for="Password" />
+                    </td>
+                </tr>
+               <tr>
+                   <td colspan="2">
+                       <span style="color:red;">@ViewBag.LoginMessage</span>
+                   </td>
+               </tr>
+                <tr>
+                    <td colspan="2">
+                        <input class="btn btn-primary btn-sm" type="submit" value="Login" />
+                    </td>
+                </tr>
+            </table>
+        </form>
+     </div>
+
+</div>
+

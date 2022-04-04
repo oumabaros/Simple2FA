@@ -1,0 +1,26 @@
+﻿
+<div class="row">
+    <div class="col-lg-4">
+        <form method="post" asp-action="TwoFactorAuthPost" asp-controller="Home">
+            <table>
+                <tr>
+                    <td colspan="2">
+                        <img src="@ViewBag.BarcodeImageUrl" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Input security code: <input name="inputCode" /><br />
+                        <input type="hidden" name="username" value="@ViewBag.username" /><br />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input class="btn btn-primary btn-sm" type="submit" value="Verify" />
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+</div>
