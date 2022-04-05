@@ -1,4 +1,4 @@
-﻿using Google.Authenticator;
+﻿using GoogleAuthenticatorService.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Simple2FA.Controllers
@@ -50,28 +51,29 @@ namespace Simple2FA.Controllers
         public ActionResult TwoFactorAuth( string username)
         {
             TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
-            var setupInfo = twoFactor.GenerateSetupCode("Simple2FA", username, TwoFactorKey(username), false, 3);
-            
+            var secretCode = Guid.NewGuid().ToString().Replace("-", "")[0..10];
+            var accountSecretKey = $"{secretCode}-{username}";
+            var setupInfo = twoFactor.GenerateSetupCode("Simple2FA", accountSecretKey, 400, 400);
             ViewBag.SetupCode = setupInfo.ManualEntryKey;
             ViewBag.BarcodeImageUrl = setupInfo.QrCodeSetupImageUrl;
-            ViewBag.username = username;
+            ViewBag.accountSecretKey = accountSecretKey;
             return View();
         }
 
         [HttpPost]
-        public ActionResult TwoFactorAuthPost(string inputCode,string username)
+        public ActionResult TwoFactorAuthPost(string accountSecretKey, string inputCode)
         {
             TwoFactorAuthenticator twoFactor = new TwoFactorAuthenticator();
-            bool isValid = twoFactor.ValidateTwoFactorPIN(TwoFactorKey(username), inputCode);
+            bool isValid = twoFactor.ValidateTwoFactorPIN(accountSecretKey, inputCode);
             if (!isValid)
             {
                 return Redirect("/Home/Index");
             }
             return Redirect("/Home/Dashboard");
         }
-        private static string TwoFactorKey(string username)
+        private static string TwoFactorKey(string accountSecretKey)
         {
-            return $"mysecretkey+{username}";
+            return $"mysecretkey+{accountSecretKey}";
         }
 
         public IActionResult Privacy()
